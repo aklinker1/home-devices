@@ -1,0 +1,13 @@
+[
+    {
+        "tag": "Remote",
+        "color": "BG_RED",
+        "command": "yarn start:dev",
+        "directory": "../client-remote"
+    },
+    {
+        "tag": "Local",
+        "color": "BG_BLUE",
+        "command": "yarn start:dev"
+    }
+]

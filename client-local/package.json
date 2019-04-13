@@ -9,20 +9,24 @@
   },
   "license": "MIT",
   "private": false,
+  "types": "types",
   "scripts": {
-    "start:dev": "ts-node index.ts",
+    "start:dev": "NODE_ENV=dev ts-node index.ts",
     "start:prod": "./scripts/prod.sh",
+    "start:remote+local": "multi-proc start",
     "build": "tsc -p ."
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/express": "^4.16.1",
+    "multi-proc": "^1.1.0",
     "ts-node": "^8.0.3",
     "typescript": "^3.4.3"
   },
   "dependencies": {
-    "@types/axios": "^0.14.0",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "externalip": "^1.0.2"
   }
 }

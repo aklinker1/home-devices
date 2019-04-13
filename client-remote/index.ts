@@ -26,8 +26,8 @@ function forwardRequest(method: string) {
 
         try {
             const forwardResponse: AxiosResponse<any> = await axios.request({
-                baseURL: `http://${localClientIpAddress}:7999`,
-                params: req.params,
+                baseURL: `http://${localClientIpAddress}:8080`,
+                params: req.query,
                 headers: req.headers,
                 method,
                 url: req.path.replace('/forward', ''),
@@ -52,25 +52,30 @@ function auth(req: Express.Request, res: Express.Response, next: Express.NextFun
     next();
 }
 
+function logger(req: Express.Request, _: Express.Response, next: Express.NextFunction) {
+    console.log(`${req.method} ${req.path}`);
+    next();
+}
+
 // Web page
 app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
 
 // Forward request to client-local
-app.get(ROUTES.forward, auth, forwardRequest('GET'));
-app.post(ROUTES.forward, auth, forwardRequest('POST'));
-app.put(ROUTES.forward, auth, forwardRequest('PUT'));
-app.delete(ROUTES.forward, auth, forwardRequest('DELETE'));
+app.get(ROUTES.forward, auth, logger, forwardRequest('GET'));
+app.post(ROUTES.forward, auth, logger, forwardRequest('POST'));
+app.put(ROUTES.forward, auth, logger, forwardRequest('PUT'));
+app.delete(ROUTES.forward, auth, logger, forwardRequest('DELETE'));
 
 // Local client IP address
-app.post(ROUTES.localClientIp, auth, (req, res) => {
+app.post(ROUTES.localClientIp, auth, logger, (req, res) => {
     localClientIpAddress = req.query.ipAddress || null;
     res.status(200);
     res.send({ ipAddress: localClientIpAddress });
 });
-app.get(ROUTES.localClientIp, auth, (_, res) => {
+app.get(ROUTES.localClientIp, auth, logger, (_, res) => {
     res.status(200);
     res.send({ ipAddress: localClientIpAddress });
 })
 
-const port = 7999;
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const port = 8000;
+app.listen(port, () => console.log(`Started on port ${port}`));
