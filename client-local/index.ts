@@ -1,13 +1,35 @@
 import Express from 'express';
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosResponse, AxiosError, AxiosPromise } from 'axios';
 import bodyParser = require('body-parser');
+import os from 'os';
+
+type DeviceType = '' | '';
+interface Device {
+    id: string;
+    type: DeviceType;
+    endpoints: Array<['GET' | 'POST' | 'PUT' | 'DELETE', string]>
+    data: any;
+}
+interface ConnectedDevice extends Device {
+    /**
+     * The final digit in the device's local network IP address: `127.0.0.???`
+     */
+    subNetAddress: number;
+    /**
+     * The port the device is running on.
+     */
+    port: number;
+}
 
 // Variables
-let localClientIpAddress: string | null = null;
+let connectedDevices: { [id: string]: ConnectedDevice };
 const ROUTES = {
-    forward: /\/forward\/.+$/,
-    localClientIp: '/local-client-ip',
+    device: '/device/:deviceId',
+    devices: '/devices',
 }
+const ALLOWED_PORTS = [
+    8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009,
+]
 
 // Setup application
 const app = Express();
@@ -16,58 +38,35 @@ app.use(bodyParser.json());
 // Helper functions
 function forwardRequest(method: string) {
     return async (req: Express.Request, res: Express.Response) => {
-        if (localClientIpAddress == null) {
-            res.status(502); // Bad Gateway
-            res.send({
-                error: 'Local IP address not cached',
-            });
-            return;
-        }
 
-        try {
-            const forwardResponse: AxiosResponse<any> = await axios.request({
-                baseURL: `http://${localClientIpAddress}:7999`,
-                params: req.params,
-                headers: req.headers,
-                method,
-                url: req.path.replace('/forward', ''),
-                data: req.body,
-            });
-            res.status(forwardResponse.status);
-            res.send(forwardResponse.data);
-        } catch (err) {
-            const axiosError = err as AxiosError;
-            if (!axiosError.response) {
-                res.status(500);
-                res.send({ error: 'Unknown error' });
-            } else {
-                res.status(axiosError.response.status);
-                res.send(axiosError.response.data);
-            }
-        }
     };
 }
 
-function auth(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
-    next();
+async function getExternalIpAddress(): Promise<string> {
+    return '';
 }
 
-// Forward request to client-local
-app.get(ROUTES.forward, auth, forwardRequest('GET'));
-app.post(ROUTES.forward, auth, forwardRequest('POST'));
-app.put(ROUTES.forward, auth, forwardRequest('PUT'));
-app.delete(ROUTES.forward, auth, forwardRequest('DELETE'));
+async function updateConnectedDevices(): Promise<void> {
+    for (let i = 1; i <= 255; i++) {
+        for (let p of ALLOWED_PORTS) {
+            try {
+                const device: AxiosPromise<Device> = await axios.get(`http://192.168.0.${i}:${p}/discover`);
+                const connectedDevice: ConnectedDevice = {
+                    ...device,
+                    port: p,
+                    subNetAddress: i
+                }
+            } catch (err) {
 
-// Local client IP address
-app.post(ROUTES.localClientIp, auth, (req, res) => {
-    localClientIpAddress = req.query.ipAddress || null;
-    res.status(200);
-    res.send({ ipAddress: localClientIpAddress });
+            }
+        }
+    }
+}
+
+// Devices Request
+app.get(ROUTES.devices, (req, res) => {
+    
 });
-app.get(ROUTES.localClientIp, auth, (_, res) => {
-    res.status(200);
-    res.send({ ipAddress: localClientIpAddress });
-})
 
-const port = 7999;
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const port = 8080;
+app.listen(port, () => console.log(`Started on port ${port}`));

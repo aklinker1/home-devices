@@ -26,7 +26,7 @@ function forwardRequest(method: string) {
 
         try {
             const forwardResponse: AxiosResponse<any> = await axios.request({
-                baseURL: `http://${localClientIpAddress}:7999`,
+                baseURL: `http://${localClientIpAddress}:8000`,
                 params: req.params,
                 headers: req.headers,
                 method,
@@ -72,5 +72,5 @@ app.get(ROUTES.localClientIp, auth, (_, res) => {
     res.send({ ipAddress: localClientIpAddress });
 })
 
-const port = 7999;
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+const port = 8000;
+app.listen(port, () => console.log(`Started on port ${port}`));
