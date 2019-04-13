@@ -1,42 +1,76 @@
 import Express from 'express';
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 import bodyParser = require('body-parser');
-let localClientIpAddress: string | null = null;
 
+// Variables
+let localClientIpAddress: string | null = null;
+const ROUTES = {
+    forward: /\/forward\/.+$/,
+    localClientIp: '/local-client-ip',
+}
+
+// Setup application
 const app = Express();
 app.use(bodyParser.json());
 
-// Web page
-app.get('/', (req, res) => {
-    res.sendFile('index.html');
-});
-
-// Forward request to device
-app.get('/forward/device/:deviceId', forwardRequest('GET'));
-app.post('/forward/device/:deviceId', forwardRequest('POST'));
-app.put('/forward/device/:deviceId', forwardRequest('PUT'));
-app.delete('/forward/device/:deviceId', forwardRequest('DELETE'));
+// Helper functions
 function forwardRequest(method: string) {
     return async (req: Express.Request, res: Express.Response) => {
         if (localClientIpAddress == null) {
             res.status(502); // Bad Gateway
             res.send({
-                error: 'Local IP address not cached. Try again in half an hour.',
+                error: 'Local IP address not cached',
             });
             return;
         }
 
-        const forwardResponse: AxiosResponse<any> = await axios.request({
-            baseURL: `http://${localClientIpAddress}:8000`,
-            params: req.params,
-            headers: req.headers,
-            method,
-            url: req.path.replace('/forward', ''),
-            data: req.body,
-        })
+        try {
+            const forwardResponse: AxiosResponse<any> = await axios.request({
+                baseURL: `http://${localClientIpAddress}:7999`,
+                params: req.params,
+                headers: req.headers,
+                method,
+                url: req.path.replace('/forward', ''),
+                data: req.body,
+            });
+            res.status(forwardResponse.status);
+            res.send(forwardResponse.data);
+        } catch (err) {
+            const axiosError = err as AxiosError;
+            if (!axiosError.response) {
+                res.status(500);
+                res.send({ error: 'Unknown error' });
+            } else {
+                res.status(axiosError.response.status);
+                res.send(axiosError.response.data);
+            }
+        }
     };
 }
 
-// Get all Devices
+function auth(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
+    next();
+}
 
-app.listen(8000, () => console.log(`Example app listening on port 8000!`));
+// Web page
+app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
+
+// Forward request to client-local
+app.get(ROUTES.forward, auth, forwardRequest('GET'));
+app.post(ROUTES.forward, auth, forwardRequest('POST'));
+app.put(ROUTES.forward, auth, forwardRequest('PUT'));
+app.delete(ROUTES.forward, auth, forwardRequest('DELETE'));
+
+// Local client IP address
+app.post(ROUTES.localClientIp, auth, (req, res) => {
+    localClientIpAddress = req.query.ipAddress || null;
+    res.status(200);
+    res.send({ ipAddress: localClientIpAddress });
+});
+app.get(ROUTES.localClientIp, auth, (_, res) => {
+    res.status(200);
+    res.send({ ipAddress: localClientIpAddress });
+})
+
+const port = 7999;
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));

@@ -14,7 +14,7 @@ Hosted at [home.aklinker1.io/api](https://home.aklinker1.io/) on [DigitalOcean](
 
 ## `client-local`
 
-Hosted on my local RaspberryPi. It will be on port `8000`. It will update the IP address of the itself every 30 minutes on the `client-remote`.
+Hosted on my local RaspberryPi. It will be on port `7999`. It will update the IP address of the itself every 30 minutes on the `client-remote`.
 
 ```bash
 # Windows
