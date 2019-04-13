@@ -32,9 +32,10 @@ Each device will handle the `GET /discover` endpoint on a port between `8001` th
 
 ### Current Device Types
 
-- `garden`
+- `device_hub`
+- `watering_system`
 - `*nock`
 - `*picture`
 - `*video`
 - `*ftp`
-- `*google-home`
+- `*google_home`
