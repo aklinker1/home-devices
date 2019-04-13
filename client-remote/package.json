@@ -1,0 +1,28 @@
+{
+  "name": "client-remote",
+  "version": "0.1.0",
+  "repository": "https://github.com/aklinker1/home-devices.git",
+  "author": {
+    "email": "aaronklinker1@gmail.com",
+    "name": "Aaron Klinker",
+    "url": "https://www.aklinker1.io"
+  },
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start:dev": "ts-node index.ts",
+    "start:prod": "yarn build && node dist/index.js",
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/express": "^4.16.1",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.4.3"
+  },
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  }
+}
