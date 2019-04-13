@@ -12,6 +12,7 @@
   "scripts": {
     "start:dev": "ts-node index.ts",
     "start:prod": "./scripts/prod.sh",
+    "start:remote+local": "multi-proc start",
     "build": "tsc -p ."
   },
   "devDependencies": {
@@ -24,6 +25,7 @@
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
-    "externalip": "^1.0.2"
+    "externalip": "^1.0.2",
+    "multi-proc": "^1.1.0"
   }
 }

@@ -52,6 +52,11 @@ function forwardRequest(method: string) {
     };
 }
 
+function logger(req: Express.Request, _: Express.Response, next: Express.NextFunction) {
+    console.log(`${req.method} ${req.path}`);
+    next();
+}
+
 async function getExternalIpAddress(): Promise<string> {
     return '';
 }
@@ -84,7 +89,7 @@ app.get(ROUTES.discover, (_, res) => {
 })
 
 // Devices Request
-app.get(ROUTES.devices, async (req, res) => {
+app.get(ROUTES.devices, logger, async (req, res) => {
     if (req.query.refresh === 'true') {
         await updateConnectedDevices();
     }
