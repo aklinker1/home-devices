@@ -27,7 +27,7 @@ function forwardRequest(method: string) {
         try {
             const forwardResponse: AxiosResponse<any> = await axios.request({
                 baseURL: `http://${localClientIpAddress}:8080`,
-                params: req.params,
+                params: req.query,
                 headers: req.headers,
                 method,
                 url: req.path.replace('/forward', ''),

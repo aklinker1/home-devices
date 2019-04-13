@@ -27,7 +27,8 @@ type ConnectedDeviceMap = { [id: string]: ConnectedDevice };
 let connectedDevices: ConnectedDeviceMap;
 let remoteClientUrl = process.env.REMOTE_URL || 'localhost:8000';
 const DEVICE_INFO: DeviceInfo = {
-    id: 'Raspberry Pi 3b Server',
+    id: 'klinker-server',
+    name: 'Raspberry Pi 3b Server',
     type: 'device_hub',
     endpoints: [
         ['GET', '/devices?refresh=[true]'],
@@ -87,7 +88,7 @@ app.get(ROUTES.discover, logger, (_, res) => {
 // Devices Request
 app.get(ROUTES.devices, logger, async (req, res) => {
     if (req.query.refresh === 'true') {
-        await updateConnectedDevices();
+        await updateConnectedDevices(true);
     }
     res.status(200);
     res.send(Object.values(connectedDevices));
@@ -118,7 +119,7 @@ async function postExternalIpAddressToRemote() {
     setTimeout(postExternalIpAddressToRemote, 1 * 1000*60*60); // 1 hour
 }
 
-async function updateConnectedDevices(): Promise<void> {
+async function updateConnectedDevices(skipTimeout: boolean = false): Promise<void> {
     console.log('Updating device list... ');
     const addressesToScan: [number, number][] = [];
     for (let subNet = 1; subNet <= 255; subNet++) for (let port of ALLOWED_PORTS) {
@@ -143,14 +144,14 @@ async function updateConnectedDevices(): Promise<void> {
     console.log(deviceIds.length + ' discovered');
     console.log(deviceIds);
 
-    setTimeout(updateConnectedDevices, 30 * 1000 * 60); // 30 minutes
+    if (skipTimeout) {
+        setTimeout(updateConnectedDevices, 30 * 1000 * 60); // 30 minutes
+    }
 }
 
 const port = 8080;
 app.listen(port, async () => {
     console.log(`Started on port ${port}\n`);
-
     await updateConnectedDevices();
-
     await postExternalIpAddressToRemote();
 });
