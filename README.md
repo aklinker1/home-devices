@@ -14,7 +14,7 @@ Hosted at [home.aklinker1.io/api](https://home.aklinker1.io/) on [DigitalOcean](
 
 ## `client-local`
 
-Hosted on my local RaspberryPi. It will be on port `7999`. It will update the IP address of the itself every 30 minutes on the `client-remote`.
+Hosted on my local RaspberryPi. It will be on port `8080`. It will update the IP address of the itself every 30 minutes on the `client-remote`.
 
 ```bash
 # Windows
@@ -28,7 +28,7 @@ ssh aklinker1@klinker-server.local
 
 ## `device-*`
 
-Each device will handle the `GET /discover` endpoint on a port between `8001` through `8009`. `*` represents devices I plan on making in the future.
+Each device will handle the `GET /discover` endpoint on a port between `8001 - 8009` (other ports are allowed, see `client-local/index.ts#ALLOWED_PORTS`). `*` represents devices I plan on making in the future.
 
 ### Current Device Types
 

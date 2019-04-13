@@ -9,8 +9,9 @@
   },
   "license": "MIT",
   "private": false,
+  "types": "types",
   "scripts": {
-    "start:dev": "ts-node index.ts",
+    "start:dev": "NODE_ENV=dev ts-node index.ts",
     "start:prod": "./scripts/prod.sh",
     "start:remote+local": "multi-proc start",
     "build": "tsc -p ."
@@ -26,6 +27,7 @@
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "externalip": "^1.0.2",
-    "multi-proc": "^1.1.0"
+    "multi-proc": "^1.1.0",
+    "node-cron": "^2.0.3"
   }
 }

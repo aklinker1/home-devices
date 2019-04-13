@@ -10,7 +10,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "start:dev": "ts-node index.ts",
+    "start:dev": "NODE_ENV=dev ts-node index.ts",
     "start:remote+local": "multi-proc start",
     "start:prod": "./scripts/prod.sh",
     "build": "tsc -p ."
