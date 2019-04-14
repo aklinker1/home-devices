@@ -1,37 +1,43 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const logger = require('./logger');
-const cron = require('node-cron');
-const axios = require('axios');
+import Express from 'express';
+import bodyParser from 'body-parser';
+import cron from 'node-cron';
+import axios, { AxiosResponse } from 'axios';
+import DeviceInfo from '../DeviceInfo';
 
-const app = express();
-var globalJobs = [];
+const app = Express();
+var globalJobs: cron.ScheduledTask[] = [];
+const DEVICE_INFO: DeviceInfo = {
+    id: 'watering-system-master',
+    name: 'Watering System Schedular',
+    type: 'watering_system_master',
+    endpoints: [
+    ]
+}
 
 // Middleware
 app.use(logger);
-app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+function logger(req: Express.Request, _: Express.Response, next: Express.NextFunction) {
+    console.log(`${req.method} ${req.path}`);
+    next();
+}
+
 // Endpoints
-app.get('/', (req, res) => {
-    res.status(200).send({
-        api: 'Klinker Garden',
-        time: Date.now(),
-        version: '0.1.0'
-    });
+app.get('/discover', (req: Express.Request, res: Express.Response) => {
+    res.status(200).send(DEVICE_INFO);
 });
 
-app.post('/water', (req, res) => {
-    axios.post('http://192.168.0.22:80/water', req.body).then(axiosRes => {
-        console.log(axiosRes.data);
-        res.status(200).send(axiosRes.data);
-    }).catch(err => {
-        console.error(err);
+app.post('/water/:slaveIpAndPort', async (req: Express.Request, res: Express.Response) => {
+    try {
+        const response: AxiosResponse = await axios.post(`http://${req.params.slaveIpAndPort}/water`, req.body);
+        res.status(200).send(response.data);
+    } catch (err) {
         res.status(500).send(err);
-    });
+    }
 });
 
-app.post('/schedule', (req, res) => {
+app.post('/schedule', (req: Express.Request, res: Express.Response) => {
     console.log('canceling current jobs...');
     globalJobs.forEach(job => {
         job.stop();

@@ -38,11 +38,9 @@ function forwardRequest(method: string) {
         } catch (err) {
             const axiosError = err as AxiosError;
             if (!axiosError.response) {
-                res.status(500);
-                res.send({ error: 'Unknown error' });
+                res.status(500).send({ error: 'Unknown error' });
             } else {
-                res.status(axiosError.response.status);
-                res.send(axiosError.response.data);
+                res.status(axiosError.response.status).send(axiosError.response.data);
             }
         }
     };
@@ -69,13 +67,11 @@ app.delete(ROUTES.forward, auth, logger, forwardRequest('DELETE'));
 // Local client IP address
 app.post(ROUTES.localClientIp, auth, logger, (req, res) => {
     localClientIpAddress = req.query.ipAddress || null;
-    res.status(200);
-    res.send({ ipAddress: localClientIpAddress });
+    res.status(200).send({ ipAddress: localClientIpAddress });
 });
 app.get(ROUTES.localClientIp, auth, logger, (_, res) => {
-    res.status(200);
-    res.send({ ipAddress: localClientIpAddress });
-})
+    res.status(200).send({ ipAddress: localClientIpAddress });
+});
 
 const port = 8000;
 app.listen(port, () => console.log(`Started on port ${port}`));

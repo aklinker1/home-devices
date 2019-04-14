@@ -81,8 +81,7 @@ async function getReferenceIpAddress(): Promise<string> {
 
 // Discover Request
 app.get(ROUTES.discover, logger, (_, res) => {
-    res.status(200);
-    res.send(DEVICE_INFO);
+    res.status(200).send(DEVICE_INFO);
 })
 
 // Devices Request
@@ -90,18 +89,15 @@ app.get(ROUTES.devices, logger, async (req, res) => {
     if (req.query.refresh === 'true') {
         await updateConnectedDevices(true);
     }
-    res.status(200);
-    res.send(Object.values(connectedDevices));
+    res.status(200).send(Object.values(connectedDevices));
 });
 
 app.get(ROUTES.device, logger, async (req, res) => {
     const device = connectedDevices[req.params.deviceId];
     if (device) {
-        res.status(200);
-        res.send(connectedDevices);
+        res.status(200).send(connectedDevices);
     } else {
-        res.status(400);
-        res.send({ error: `Device with id=${req.params.deviceId} not found` });
+        res.status(400).send({ error: `Device with id=${req.params.deviceId} not found` });
     }
 });
 
