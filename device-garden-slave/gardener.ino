@@ -45,7 +45,7 @@ const int PIN_MAP[] = {
   15,  // D8
 };
 
-ESP8266WebServer server(80);
+ESP8266WebServer server(8080);
 Plant plants[MAX_PLANTS];
 int plantCount = 0;
 
@@ -124,9 +124,21 @@ void postPlants() {
   server.send(200, "application/json", plantsToJSON());
 }
 
-void getRoot() {
+void getDiscover() {
   led(LED_BUILTIN, false);
-  server.send(200, "application/json", "{ \"data\": \"Klinker Garden is online!\"  }");
+  server.send(
+    200,
+    "application/json",
+    "{"
+    "  \"id\": \"outdoor_arduino_1\","
+    "  \"name\": \"Outdoor Garden Arduino\","
+    "  \"type\": \"garden_slave\","
+    "  endpoints: ["
+    "    [\"GET\", \"/water\"],"
+    "    [\"POST\", \"/water\"]"
+    "  ]"
+    "}"
+  );
   led(LED_BUILTIN, true);
 }
 
@@ -166,7 +178,7 @@ void setup() {
   }
   led(LED_BUILTIN, true);
   
-  server.on("/", HTTP_GET, getRoot);
+  server.on("/discover", HTTP_GET, getDiscover);
   server.on("/water", HTTP_GET, getPlants);
   server.on("/water", HTTP_POST, postPlants);
   server.onNotFound(handleNotFound);

@@ -47,8 +47,7 @@ const ROUTES = {
     discover: '/discover',
 }
 const ALLOWED_PORTS = [
-    8000, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009,
-    8080,
+    8080, 8081, 8082, 8083, 8084, 8085, 8086, 8087, 8088, 8089,
 ]
 
 // Setup application
@@ -81,8 +80,7 @@ async function getReferenceIpAddress(): Promise<string> {
 
 // Discover Request
 app.get(ROUTES.discover, logger, (_, res) => {
-    res.status(200);
-    res.send(DEVICE_INFO);
+    res.status(200).send(DEVICE_INFO);
 })
 
 // Devices Request
@@ -90,18 +88,15 @@ app.get(ROUTES.devices, logger, async (req, res) => {
     if (req.query.refresh === 'true') {
         await updateConnectedDevices(true);
     }
-    res.status(200);
-    res.send(Object.values(connectedDevices));
+    res.status(200).send(Object.values(connectedDevices));
 });
 
 app.get(ROUTES.device, logger, async (req, res) => {
     const device = connectedDevices[req.params.deviceId];
     if (device) {
-        res.status(200);
-        res.send(connectedDevices);
+        res.status(200).send(connectedDevices);
     } else {
-        res.status(400);
-        res.send({ error: `Device with id=${req.params.deviceId} not found` });
+        res.status(400).send({ error: `Device with id=${req.params.deviceId} not found` });
     }
 });
 
