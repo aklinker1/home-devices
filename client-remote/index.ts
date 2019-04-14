@@ -5,8 +5,8 @@ import bodyParser = require('body-parser');
 // Variables
 let localClientIpAddress: string | null = null;
 const ROUTES = {
-    forward: /\/forward\/.+$/,
-    localClientIp: '/local-client-ip',
+    forward: /\/api\/forward\/.+$/,
+    localClientIp: '/api/local-client-ip',
 }
 
 // Setup application
@@ -46,32 +46,28 @@ function forwardRequest(method: string) {
     };
 }
 
-function auth(req: Express.Request, res: Express.Response, next: Express.NextFunction) {
-    next();
-}
-
 function logger(req: Express.Request, _: Express.Response, next: Express.NextFunction) {
     console.log(`${req.method} ${req.path}`);
     next();
 }
 
-// Web page
-app.get('/', (req, res) => res.sendFile(__dirname + '/index.html'));
-
 // Forward request to client-local
-app.get(ROUTES.forward, auth, logger, forwardRequest('GET'));
-app.post(ROUTES.forward, auth, logger, forwardRequest('POST'));
-app.put(ROUTES.forward, auth, logger, forwardRequest('PUT'));
-app.delete(ROUTES.forward, auth, logger, forwardRequest('DELETE'));
+app.get(ROUTES.forward, logger, forwardRequest('GET'));
+app.post(ROUTES.forward, logger, forwardRequest('POST'));
+app.put(ROUTES.forward, logger, forwardRequest('PUT'));
+app.delete(ROUTES.forward, logger, forwardRequest('DELETE'));
 
 // Local client IP address
-app.post(ROUTES.localClientIp, auth, logger, (req, res) => {
+app.post(ROUTES.localClientIp, logger, (req, res) => {
     localClientIpAddress = req.query.ipAddress || null;
     res.status(200).send({ ipAddress: localClientIpAddress });
 });
-app.get(ROUTES.localClientIp, auth, logger, (_, res) => {
+app.get(ROUTES.localClientIp, logger, (_, res) => {
     res.status(200).send({ ipAddress: localClientIpAddress });
 });
+
+// All Other endpoints
+app.get(/.*/, logger, (req, res) => res.status(404).send({ error: req.path + ' not found' }));
 
 const port = 8000;
 app.listen(port, () => console.log(`Started on port ${port}`));

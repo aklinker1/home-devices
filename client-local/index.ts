@@ -47,8 +47,7 @@ const ROUTES = {
     discover: '/discover',
 }
 const ALLOWED_PORTS = [
-    8000, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009,
-    8080,
+    8080, 8081, 8082, 8083, 8084, 8085, 8086, 8087, 8088, 8089,
 ]
 
 // Setup application
