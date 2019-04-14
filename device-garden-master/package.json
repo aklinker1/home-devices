@@ -1,0 +1,23 @@
+{
+  "name": "home-garden",
+  "version": "0.1.0",
+  "main": "index.js",
+  "repository": "https://github.com/aklinker1/home-garden.git",
+  "author": "Aaron Klinker <aaronklinker1@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon index.js",
+    "start:prod": "yarn install --prod && node index.js"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
+    "colors": "^1.3.2",
+    "express": "^4.16.3",
+    "morgan": "^1.9.0",
+    "node-cron": "^2.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  }
+}
