@@ -1,0 +1,14 @@
+{
+    "apps": [
+        {
+            "name": "home-devices-local-client",
+            "script": "./client-local/dist/index.js",
+            "watch": true
+        },
+        {
+            "name": "home-devices-garden-master",
+            "script": "./device-garden-master/dist/index.js",
+            "watch": true
+        }
+    ]
+}
