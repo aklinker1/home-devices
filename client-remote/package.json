@@ -14,7 +14,9 @@
     "start:remote+local": "multi-proc start",
     "start:prod": "./scripts/prod.sh",
     "build": "tsc -p .",
-    "deploy": "ssh -t aklinker1@aklinker1.io \"cd /home/aklinker1 && source .nvm/nvm.sh && ./start-home-devices.sh\""
+    "prod:deploy": "ssh -t aklinker1@aklinker1.io \"cd /home/aklinker1 && source .nvm/nvm.sh && ./start-home-devices.sh\"",
+    "prod:status": "ssh -t aklinker1@aklinker1.io \"cd /home/aklinker1 && source .nvm/nvm.sh && pm2 list\"",
+    "prod:logs": "ssh -t aklinker1@aklinker1.io \"cd /home/aklinker1 && source .nvm/nvm.sh && pm2 logs\""
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",

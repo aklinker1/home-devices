@@ -14,7 +14,10 @@
     "start:dev": "NODE_ENV=dev ts-node index.ts",
     "start:prod": "./scripts/prod.sh",
     "start:remote+local": "multi-proc start",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "prod:deploy": "ssh -t aklinker1@klinker-server.local \"cd /home/aklinker1 && source .nvm/nvm.sh && ./start-home-devices.sh\"",
+    "prod:status": "ssh -t aklinker1@klinker-server.local \"cd /home/aklinker1 && source .nvm/nvm.sh && pm2 list\"",
+    "prod:logs": "ssh -t aklinker1@klinker-server.local \"cd /home/aklinker1 && source .nvm/nvm.sh && pm2 logs\""
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
