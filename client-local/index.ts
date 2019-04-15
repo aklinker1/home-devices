@@ -25,7 +25,7 @@ type ConnectedDeviceMap = { [id: string]: ConnectedDevice };
 
 // Variables
 let connectedDevices: ConnectedDeviceMap;
-let remoteClientUrl = process.env.REMOTE_URL || 'localhost:8000';
+let remoteClientUrl = process.env.NODE_ENV === 'dev' ? 'http://localhost:8000' : 'https://home.aklinker1.io/api';
 const DEVICE_INFO: DeviceInfo = {
     id: 'klinker-server',
     name: 'Raspberry Pi 3b Server',
@@ -106,7 +106,7 @@ async function postExternalIpAddressToRemote() {
     try {
         const ipAddress = await getReferenceIpAddress();
         console.log('IP Address: ' + ipAddress);
-        await axios.post(`http://${remoteClientUrl}/local-client-ip`, undefined, { params: { ipAddress } });
+        await axios.post(`${remoteClientUrl}/local-client-ip`, undefined, { params: { ipAddress } });
         console.log('Success');
     } catch (err) {
         console.log('Failed to update client-remote with the current IP address');
