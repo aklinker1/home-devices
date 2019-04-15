@@ -13,7 +13,8 @@
     "start:dev": "NODE_ENV=dev ts-node index.ts",
     "start:remote+local": "multi-proc start",
     "start:prod": "./scripts/prod.sh",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "deploy": "ssh -t aklinker1@aklinker1.io \"cd /home/aklinker1 && source .nvm/nvm.sh && ./start-home-devices.sh\""
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
