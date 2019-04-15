@@ -30,7 +30,7 @@ function forwardRequest(method: string) {
                 params: req.query,
                 headers: req.headers,
                 method,
-                url: req.path.replace('/forward', ''),
+                url: req.path.replace('/forward', '').replace('/api', ''),
                 data: req.body,
             });
             res.status(forwardResponse.status);
