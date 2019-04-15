@@ -123,7 +123,7 @@ async function updateConnectedDevices(skipTimeout: boolean = false): Promise<voi
     async function scanAddress(subNetAddress: number, port: number): Promise<ConnectedDevice> {
         const device: AxiosResponse<Device> = await axios.get(
             `http://192.168.0.${subNetAddress}:${port}/discover`,
-            { timeout: 1000 },
+            { timeout: 10000 },
         );
         return { ...device.data, port, subNetAddress };
     }
