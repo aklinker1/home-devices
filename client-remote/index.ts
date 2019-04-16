@@ -30,11 +30,10 @@ function forwardRequest(method: string) {
                 params: req.query,
                 headers: req.headers,
                 method,
-                url: req.path.replace('/forward', '').replace('/api', ''),
+                url: req.path.replace('/api', '').replace('/forward', ''),
                 data: req.body,
             });
-            res.status(forwardResponse.status);
-            res.send(forwardResponse.data);
+            res.status(forwardResponse.status).send(forwardResponse.data);
         } catch (err) {
             const axiosError = err as AxiosError;
             if (!axiosError.response) {
