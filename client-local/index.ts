@@ -94,7 +94,7 @@ app.get(ROUTES.devices, logger, async (req, res) => {
 app.get(ROUTES.device, logger, async (req, res) => {
     const device = connectedDevices[req.params.deviceId];
     if (device) {
-        res.status(200).send(connectedDevices);
+        res.status(200).send(device);
     } else {
         res.status(400).send({ error: `Device with id=${req.params.deviceId} not found` });
     }
