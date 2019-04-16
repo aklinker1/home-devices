@@ -31,7 +31,6 @@ const DEVICE_INFO: DeviceInfo = {
     name: 'Garden Schedular',
     type: 'garden_master',
     endpoints: [
-        ['POST', '/water/:slaveIpAndPort'],
         ['GET', '/schedule/:slaveIpAndPort'],
         ['POST', '/schedule/:slaveIpAndPort'],
     ],
@@ -50,16 +49,6 @@ function logger(req: Express.Request, _: Express.Response, next: Express.NextFun
 // Endpoints
 app.get('/discover', (req: Express.Request, res: Express.Response) => {
     res.status(200).send(DEVICE_INFO);
-});
-
-app.post('/water/:slaveIpAndPort', async (req: Express.Request, res: Express.Response) => {
-    try {
-        const slaveIpAndPort = req.params.slaveIpAndPort;
-        const response: AxiosResponse = await axios.post(`http://${slaveIpAndPort}/water`, req.body);
-        res.status(200).send(response.data);
-    } catch (err) {
-        res.status(500).send(err);
-    }
 });
 
 app.get('/schedule/:slaveIpAndPort', (req: Express.Request, res: Express.Response) => {

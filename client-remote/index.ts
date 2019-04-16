@@ -37,7 +37,7 @@ function forwardRequest(method: string) {
         } catch (err) {
             const axiosError = err as AxiosError;
             if (!axiosError.response) {
-                res.status(500).send({ error: 'Unknown error' });
+                res.status(500).send({ error: 'Unknown error', message: axiosError.stack });
             } else {
                 res.status(axiosError.response.status).send(axiosError.response.data);
             }
@@ -66,7 +66,11 @@ app.get(ROUTES.localClientIp, logger, (_, res) => {
 });
 
 // All Other endpoints
-app.get(/.*/, logger, (req, res) => res.status(404).send({ error: req.path + ' not found' }));
+const unknownEndpoint = (req: Express.Request, res: Express.Response) => res.status(404).send({ error: req.method + ' ' + req.path + ' not found' })
+app.get(/.*/, logger, unknownEndpoint);
+app.post(/.*/, logger, unknownEndpoint);
+app.put(/.*/, logger, unknownEndpoint);
+app.delete(/.*/, logger, unknownEndpoint);
 
 const port = 8000;
 app.listen(port, () => console.log(`Started on port ${port}`));

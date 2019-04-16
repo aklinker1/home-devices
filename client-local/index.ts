@@ -24,7 +24,7 @@ interface ConnectedDevice extends Device {
 type ConnectedDeviceMap = { [id: string]: ConnectedDevice };
 
 // Variables
-let connectedDevices: ConnectedDeviceMap;
+let connectedDevices: ConnectedDeviceMap = {};
 let remoteClientUrl = process.env.NODE_ENV === 'dev' ? 'http://localhost:8000' : 'https://home.aklinker1.io/api';
 const DEVICE_INFO: DeviceInfo = {
     id: 'klinker-server',
@@ -42,7 +42,7 @@ const DEVICE_INFO: DeviceInfo = {
 }
 const ROUTES = {
     device: '/devices/:deviceId',
-    deviceForward: /^\/device\/:deviceId\/.*$/,
+    deviceForward: '/devices/:deviceId/*',
     devices: '/devices',
     discover: '/discover',
 }
@@ -68,18 +68,18 @@ function forwardRequest(method: string) {
 
         try {
             const forwardResponse: AxiosResponse<any> = await axios.request({
-                baseURL: `http://192.168.0.${device.subNetAddress}:${device.id}`,
+                baseURL: `http://192.168.0.${device.subNetAddress}:${device.port}`,
                 params: req.query,
                 headers: req.headers,
                 method,
-                url: req.path.replace(`/device/${device.id}`, ''),
+                url: req.path.replace(`/devices/${device.id}`, ''),
                 data: req.body,
             });
-            response.status(forwardResponse.status).send(forwardResponse.data);
+            res.status(forwardResponse.status).send(forwardResponse.data);
         } catch (err) {
             const axiosError = err as AxiosError;
             if (!axiosError.response) {
-                res.status(500).send({ error: 'Unknown error' });
+                res.status(500).send({ error: 'Unknown error', stack: axiosError.stack });
             } else {
                 res.status(axiosError.response.status).send(axiosError.response.data);
             }
@@ -131,6 +131,13 @@ app.get(ROUTES.deviceForward, logger, forwardRequest('GET'));
 app.post(ROUTES.deviceForward, logger, forwardRequest('POST'));
 app.put(ROUTES.deviceForward, logger, forwardRequest('PUT'));
 app.delete(ROUTES.deviceForward, logger, forwardRequest('DELETE'));
+
+// All Other endpoints
+const unknownEndpoint = (req: Express.Request, res: Express.Response) => res.status(404).send({ error: req.method + ' ' + req.path + ' not found' })
+app.get(/.*/, logger, unknownEndpoint);
+app.post(/.*/, logger, unknownEndpoint);
+app.put(/.*/, logger, unknownEndpoint);
+app.delete(/.*/, logger, unknownEndpoint);
 
 // Repeating Tasks
 async function postExternalIpAddressToRemote() {
