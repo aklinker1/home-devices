@@ -1,4 +1,4 @@
-import Express from 'express';
+import Express, { response } from 'express';
 import axios, { AxiosResponse, AxiosError, AxiosPromise } from 'axios';
 import bodyParser = require('body-parser');
 import DeviceInfo from '../DeviceInfo';
@@ -57,7 +57,33 @@ app.use(bodyParser.json());
 // Helper functions
 function forwardRequest(method: string) {
     return async (req: Express.Request, res: Express.Response) => {
+        const device = connectedDevices[req.params.deviceId];
+        if (device == null) {
+            res.status(502); // Bad Gateway
+            res.send({
+                error: 'Device not connected, try refreshing your device list',
+            });
+            return;
+        }
 
+        try {
+            const forwardResponse: AxiosResponse<any> = await axios.request({
+                baseURL: `http://192.168.0.${device.subNetAddress}:${device.id}`,
+                params: req.query,
+                headers: req.headers,
+                method,
+                url: req.path.replace(`/device/${device.id}`, ''),
+                data: req.body,
+            });
+            response.status(forwardResponse.status).send(forwardResponse.data);
+        } catch (err) {
+            const axiosError = err as AxiosError;
+            if (!axiosError.response) {
+                res.status(500).send({ error: 'Unknown error' });
+            } else {
+                res.status(axiosError.response.status).send(axiosError.response.data);
+            }
+        }
     };
 }
 
@@ -99,6 +125,12 @@ app.get(ROUTES.device, logger, async (req, res) => {
         res.status(400).send({ error: `Device with id=${req.params.deviceId} not found` });
     }
 });
+
+// Device forward request
+app.get(ROUTES.deviceForward, logger, forwardRequest('GET'));
+app.post(ROUTES.deviceForward, logger, forwardRequest('POST'));
+app.put(ROUTES.deviceForward, logger, forwardRequest('PUT'));
+app.delete(ROUTES.deviceForward, logger, forwardRequest('DELETE'));
 
 // Repeating Tasks
 async function postExternalIpAddressToRemote() {

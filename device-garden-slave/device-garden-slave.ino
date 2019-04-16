@@ -136,7 +136,8 @@ void getDiscover() {
     "  \"endpoints\": ["
     "    [\"GET\", \"/water\"],"
     "    [\"POST\", \"/water\"]"
-    "  ]"
+    "  ],"
+    "  \"data\": [\"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\"]"
     "}"
   );
   led(LED_BUILTIN, true);
