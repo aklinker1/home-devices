@@ -2,7 +2,7 @@ import Express from 'express';
 import bodyParser from 'body-parser';
 import cron from 'node-cron';
 import axios, { AxiosResponse } from 'axios';
-import DeviceInfo from '../DeviceInfo';
+import ServiceInfo from '../ServiceInfo';
 
 interface Pump {
     pin: number;
@@ -26,9 +26,9 @@ interface WeekSchedule {
 
 const app = Express();
 var globalJobs: cron.ScheduledTask[] = [];
-const DEVICE_INFO: DeviceInfo = {
-    id: 'watering-system-master',
-    name: 'Garden Schedular',
+const DEVICE_INFO: ServiceInfo = {
+    id: 'garden-scheduler',
+    device: 'klinker-server',
     type: 'garden_master',
     endpoints: [
         ['GET', '/schedule/:slaveIpAndPort'],

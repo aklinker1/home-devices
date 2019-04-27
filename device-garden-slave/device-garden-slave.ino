@@ -68,13 +68,6 @@ void connectWiFi(char* ssid, char* password) {
   Serial.println(WiFi.localIP());
 }
 
-/**
- * LOW = on    HIGH = off
- */
-void led(int pin, bool on) {
-  digitalWrite(pin, on ? LOW : HIGH);
-}
-
 void pump(int pin, bool on) {
   Serial.print("Pin D");
   Serial.print(pin);
@@ -83,6 +76,12 @@ void pump(int pin, bool on) {
   Serial.print(") ");
   Serial.println(on ? " on!" : " off.");
   digitalWrite(PIN_MAP[pin], on ? HIGH : LOW);
+}
+
+void setAllPins(bool on) {
+  for (int i = 0; i < 9; ++i) {
+    pinMode(PIN_MAP[i], on ? LOW : HIGH);
+  }
 }
 
 String plantsToJSON() {
@@ -125,26 +124,23 @@ void postPlants() {
 }
 
 void getDiscover() {
-  led(LED_BUILTIN, false);
   server.send(
     200,
     "application/json",
     "{"
-    "  \"id\": \"outdoor_arduino_1\","
-    "  \"name\": \"Outdoor Garden Arduino\","
+    "  \"id\": \"outdoor_garden_slave_1\","
+    "  \"device\": \"Node MCU #1\","
     "  \"type\": \"garden_slave\","
     "  \"endpoints\": ["
     "    [\"GET\", \"/water\"],"
     "    [\"POST\", \"/water\"]"
     "  ],"
-    "  \"data\": [\"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\"]"
+    "  \"data\": [\"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"pump\", \"none\"]"
     "}"
   );
-  led(LED_BUILTIN, true);
 }
 
 void handleNotFound() {
-  led(LED_BUILTIN, false);
   String message = "Endpoint not found...\n\n";
   message += "URI: ";
   message += server.uri();
@@ -160,30 +156,25 @@ void handleNotFound() {
     message += "  - " + server.headerName(i) + ": " + server.header(i) + "\n";
   }
   server.send(404, "text/plain", message);
-  led(LED_BUILTIN, true);
 }
-
-
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
-  for (int i = 0; i < 9; ++i) {
-    pinMode(PIN_MAP[i], OUTPUT);
-  }
-  pinMode(LED_BUILTIN, OUTPUT);
-  led(LED_BUILTIN, false);
+  setAllPins(false);
+
   connectWiFi("AaronsFunHouse", "fishrfriends");
   if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
-  led(LED_BUILTIN, true);
-  
   server.on("/discover", HTTP_GET, getDiscover);
   server.on("/water", HTTP_GET, getPlants);
   server.on("/water", HTTP_POST, postPlants);
   server.onNotFound(handleNotFound);
   server.begin();
+  
+  setAllPins(true);
+  delay(250);
+  setAllPins(false);
 }
 
 long prevMs = 0;

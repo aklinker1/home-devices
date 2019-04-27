@@ -1,7 +1,7 @@
 import Express, { response } from 'express';
 import axios, { AxiosResponse, AxiosError, AxiosPromise } from 'axios';
 import bodyParser = require('body-parser');
-import DeviceInfo from '../DeviceInfo';
+import ServiceInfo from '../ServiceInfo';
 import externalip from 'externalip';
 
 type DeviceType = '' | '';
@@ -26,9 +26,9 @@ type ConnectedDeviceMap = { [id: string]: ConnectedDevice };
 // Variables
 let connectedDevices: ConnectedDeviceMap = {};
 let remoteClientUrl = process.env.NODE_ENV === 'dev' ? 'http://localhost:8000' : 'https://home.aklinker1.io/api';
-const DEVICE_INFO: DeviceInfo = {
-    id: 'klinker-server',
-    name: 'Raspberry Pi 3b Server',
+const DEVICE_INFO: ServiceInfo = {
+    id: 'device_hub',
+    device: 'klinker-server',
     type: 'device_hub',
     endpoints: [
         ['GET', '/devices?refresh=[true]'],
