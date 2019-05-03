@@ -41,7 +41,7 @@ app.get('/image', (req: Express.Request, res: Express.Response) => {
     const quality = getIntQuery(req.query.quality, MIN_QUALITY, MAX_QUALITY, DEFAULT_QUALITY);
     const exposure = VALID_EXPOSURE.includes(req.query.exposure) ? req.query.exposure : null;
     
-    const args = ['-o', 'image.jpg'];
+    const args = ['-o', `${__dirname}/image.jpg`];
     if (flipX) args.push('-fx');
     if (flipY) args.push('-fy');
     args.push(`-w ${width}`);
@@ -49,7 +49,9 @@ app.get('/image', (req: Express.Request, res: Express.Response) => {
     args.push(`-q ${quality}`);
     if (exposure) args.push(`-ex ${exposure}`);
 
-    spawnSync('raspistill', args);
+    spawnSync('raspistill', args, {
+        cwd: __dirname
+    });
     res.sendFile(`${__dirname}/image.jpg`);
 });
 
