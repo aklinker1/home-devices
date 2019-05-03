@@ -80,7 +80,7 @@ void pump(int pin, bool on) {
 
 void setAllPins(bool on) {
   for (int i = 0; i < 9; ++i) {
-    pinMode(PIN_MAP[i], on ? LOW : HIGH);
+    digitalWrite(PIN_MAP[i], on ? HIGH : LOW);
   }
 }
 
@@ -160,6 +160,10 @@ void handleNotFound() {
 
 void setup() {
   Serial.begin(115200);
+  delay(10);
+  for (int i = 0; i < 9; ++i) {
+    pinMode(PIN_MAP[i], OUTPUT);
+  }
   setAllPins(false);
 
   connectWiFi("AaronsFunHouse", "fishrfriends");
