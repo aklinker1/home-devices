@@ -1,7 +1,7 @@
 import Express from 'express';
 import bodyParser from 'body-parser';
 import ServiceInfo from '../ServiceInfo';
-import { spawnSync } from 'child_process';
+import { spawnSync, execSync } from 'child_process';
 
 const app = Express();
 
@@ -49,9 +49,7 @@ app.get('/image', (req: Express.Request, res: Express.Response) => {
     args.push(`-q ${quality}`);
     if (exposure) args.push(`-ex ${exposure}`);
 
-    spawnSync('raspistill', args, {
-        cwd: __dirname
-    });
+    execSync(`raspistill ${args.join(' ')}`);
     res.sendFile(`${__dirname}/image.jpg`);
 });
 
