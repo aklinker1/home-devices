@@ -3,7 +3,7 @@
         {
             "name": "home-devices-remote-client",
             "script": "./client-remote/dist/index.js",
-            "watch": true
+            "watch": false
         }
     ]
 }

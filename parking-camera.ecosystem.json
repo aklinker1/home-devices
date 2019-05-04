@@ -3,7 +3,7 @@
         {
             "name": "home-devices-parking-camera",
             "script": "./device-parking-camera/dist/device-parking-camera/index.js",
-            "watch": true
+            "watch": false
         }
     ]
 }

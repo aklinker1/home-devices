@@ -3,12 +3,12 @@
         {
             "name": "home-devices-local-client",
             "script": "./client-local/dist/client-local/index.js",
-            "watch": true
+            "watch": false
         },
         {
             "name": "home-devices-garden-master",
             "script": "./device-garden-master/dist/device-garden-master/index.js",
-            "watch": true
+            "watch": false
         }
     ]
 }
