@@ -42,8 +42,8 @@ app.get('/image', (req: Express.Request, res: Express.Response) => {
     const exposure = VALID_EXPOSURE.includes(req.query.exposure) ? req.query.exposure : null;
     
     const args = ['-o', `${__dirname}/image.jpg`];
-    if (flipX) args.push('-fx');
-    if (flipY) args.push('-fy');
+    if (flipX) args.push('-hf');
+    if (flipY) args.push('-vf');
     args.push(`-w ${width}`);
     args.push(`-h ${height}`);
     args.push(`-q ${quality}`);
