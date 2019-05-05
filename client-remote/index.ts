@@ -33,6 +33,7 @@ function forwardRequest(method: string) {
                 url: req.path.replace('/api', '').replace('/forward', ''),
                 data: req.body,
             });
+            console.log('headers:', forwardResponse.headers);
             res.setHeader('content-type', forwardResponse.headers['content-type']);
             res.status(forwardResponse.status).send(forwardResponse.data);
         } catch (err) {
