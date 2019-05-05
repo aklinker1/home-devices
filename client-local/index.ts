@@ -75,6 +75,7 @@ function forwardRequest(method: string) {
                 url: req.path.replace(`/devices/${device.id}`, ''),
                 data: req.body,
             });
+            res.setHeader('content-type', forwardResponse.headers['content-type']);
             res.status(forwardResponse.status).send(forwardResponse.data);
         } catch (err) {
             const axiosError = err as AxiosError;
