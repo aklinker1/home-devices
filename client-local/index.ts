@@ -137,10 +137,10 @@ app.get(ROUTES.device, logger, async (req, res) => {
 });
 
 // Device forward request
-app.get(ROUTES.deviceForward, logger, forwardRequest('GET'));
-app.post(ROUTES.deviceForward, logger, forwardRequest('POST'));
-app.put(ROUTES.deviceForward, logger, forwardRequest('PUT'));
-app.delete(ROUTES.deviceForward, logger, forwardRequest('DELETE'));
+app.get(ROUTES.deviceForward, logger, forwardRequest);
+app.post(ROUTES.deviceForward, logger, forwardRequest);
+app.put(ROUTES.deviceForward, logger, forwardRequest);
+app.delete(ROUTES.deviceForward, logger, forwardRequest);
 
 // All Other endpoints
 const unknownEndpoint = (req: Express.Request, res: Express.Response) => res.status(404).send({ error: req.method + ' ' + req.path + ' not found' })
