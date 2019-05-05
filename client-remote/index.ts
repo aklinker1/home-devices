@@ -33,7 +33,7 @@ function forwardRequest(method: string) {
                 url: req.path.replace('/api', '').replace('/forward', ''),
                 data: req.body,
             });
-            res.setHeader('Content-Type', forwardResponse.headers['Content-Type']);
+            res.setHeader('content-type', forwardResponse.headers['content-type']);
             res.status(forwardResponse.status).send(forwardResponse.data);
         } catch (err) {
             const axiosError = err as AxiosError;
