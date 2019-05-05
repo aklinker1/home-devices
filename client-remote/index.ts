@@ -1,6 +1,7 @@
 import Express from 'express';
 import axios, { AxiosResponse, AxiosError } from 'axios';
 import bodyParser = require('body-parser');
+import request from 'request';
 
 // Variables
 let localClientIpAddress: string | null = null;
@@ -14,38 +15,12 @@ const app = Express();
 app.use(bodyParser.json());
 
 // Helper functions
-function forwardRequest(method: string) {
-    return async (req: Express.Request, res: Express.Response) => {
-        if (localClientIpAddress == null) {
-            res.status(502); // Bad Gateway
-            res.send({
-                error: 'Local IP address not cached',
-            });
-            return;
-        }
-
-        try {
-            const forwardResponse: AxiosResponse<any> = await axios.request({
-                baseURL: `http://${localClientIpAddress}:8080`,
-                params: req.query,
-                headers: req.headers,
-                method,
-                url: req.path.replace('/api', '').replace('/forward', ''),
-                data: req.body,
-            });
-            for (const header in forwardResponse.headers) {
-                res.setHeader(header, forwardResponse.headers[header]);
-            }
-            res.status(forwardResponse.status).send(forwardResponse.data);
-        } catch (err) {
-            const axiosError = err as AxiosError;
-            if (!axiosError.response) {
-                res.status(500).send({ error: 'Unknown error', message: axiosError.stack });
-            } else {
-                res.status(axiosError.response.status).send(axiosError.response.data);
-            }
-        }
-    };
+function forwardRequest(req: Express.Request, res: Express.Response) {
+    req.pipe(request({
+        baseUrl: `http://${localClientIpAddress}:8080`,
+        url: req.path.replace('/api', '').replace('/forward', ''),
+        qs: req.query
+    })).pipe(res)
 }
 
 function logger(req: Express.Request, _: Express.Response, next: Express.NextFunction) {
@@ -54,10 +29,10 @@ function logger(req: Express.Request, _: Express.Response, next: Express.NextFun
 }
 
 // Forward request to client-local
-app.get(ROUTES.forward, logger, forwardRequest('GET'));
-app.post(ROUTES.forward, logger, forwardRequest('POST'));
-app.put(ROUTES.forward, logger, forwardRequest('PUT'));
-app.delete(ROUTES.forward, logger, forwardRequest('DELETE'));
+app.get(ROUTES.forward, logger, forwardRequest);
+app.post(ROUTES.forward, logger, forwardRequest);
+app.put(ROUTES.forward, logger, forwardRequest);
+app.delete(ROUTES.forward, logger, forwardRequest);
 
 // Local client IP address
 app.post(ROUTES.localClientIp, logger, (req, res) => {
