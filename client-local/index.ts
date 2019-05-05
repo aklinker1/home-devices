@@ -3,6 +3,7 @@ import axios, { AxiosResponse, AxiosError, AxiosPromise } from 'axios';
 import bodyParser = require('body-parser');
 import ServiceInfo from '../ServiceInfo';
 import externalip from 'externalip';
+import request from 'request';
 
 type DeviceType = '' | '';
 interface Device {
@@ -55,39 +56,45 @@ const app = Express();
 app.use(bodyParser.json());
 
 // Helper functions
-function forwardRequest(method: string) {
-    return async (req: Express.Request, res: Express.Response) => {
-        const device = connectedDevices[req.params.deviceId];
-        if (device == null) {
-            res.status(502); // Bad Gateway
-            res.send({
-                error: 'Device not connected, try refreshing your device list',
-            });
-            return;
-        }
+function forwardRequest(req: Express.Request, res: Express.Response) {
+    const device = connectedDevices[req.params.deviceId];
+    req.pipe(request({
+        baseUrl: `http://192.168.0.${device.subNetAddress}:${device.port}`,
+        url: req.path.replace(`/devices/${device.id}`, ''),
+        qs: req.query
+    })).pipe(res)
+    // return async (req: Express.Request, res: Express.Response) => {
+    //     const device = connectedDevices[req.params.deviceId];
+    //     if (device == null) {
+    //         res.status(502); // Bad Gateway
+    //         res.send({
+    //             error: 'Device not connected, try refreshing your device list',
+    //         });
+    //         return;
+    //     }
 
-        try {
-            const forwardResponse: AxiosResponse<any> = await axios.request({
-                baseURL: `http://192.168.0.${device.subNetAddress}:${device.port}`,
-                params: req.query,
-                headers: req.headers,
-                method,
-                url: req.path.replace(`/devices/${device.id}`, ''),
-                data: req.body,
-            });
-            for (const header in forwardResponse.headers) {
-                res.setHeader(header, forwardResponse.headers[header]);
-            }
-            res.status(forwardResponse.status).send(forwardResponse.data);
-        } catch (err) {
-            const axiosError = err as AxiosError;
-            if (!axiosError.response) {
-                res.status(500).send({ error: 'Unknown error', stack: axiosError.stack });
-            } else {
-                res.status(axiosError.response.status).send(axiosError.response.data);
-            }
-        }
-    };
+    //     try {
+    //         const forwardResponse: AxiosResponse<any> = await axios.request({
+    //             baseURL: `http://192.168.0.${device.subNetAddress}:${device.port}`,
+    //             params: req.query,
+    //             headers: req.headers,
+    //             method,
+    //             url: req.path.replace(`/devices/${device.id}`, ''),
+    //             data: req.body,
+    //         });
+    //         for (const header in forwardResponse.headers) {
+    //             res.setHeader(header, forwardResponse.headers[header]);
+    //         }
+    //         res.status(forwardResponse.status).send(forwardResponse.data);
+    //     } catch (err) {
+    //         const axiosError = err as AxiosError;
+    //         if (!axiosError.response) {
+    //             res.status(500).send({ error: 'Unknown error', stack: axiosError.stack });
+    //         } else {
+    //             res.status(axiosError.response.status).send(axiosError.response.data);
+    //         }
+    //     }
+    // };
 }
 
 function logger(req: Express.Request, _: Express.Response, next: Express.NextFunction) {
